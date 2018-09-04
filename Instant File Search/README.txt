@@ -1,9 +1,9 @@
 Another simple file search utility based of indexing.
 
 
-Before moving forward, please make sure that the config in src/Db file is compatible with your current settings.
+Before moving forward, please make sure that the config in src/Db file is compatible with your settings.
 
-Current settings:
+Current settings in config file:
 
 0) Database: Oracle 11g XE.
 

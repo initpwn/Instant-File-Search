@@ -1,5 +1,7 @@
 package src;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.ResultSet;
 
 public class InitDriveTab {
@@ -18,7 +20,11 @@ public class InitDriveTab {
 						}
 					}
 				} catch (Exception e) {
-					DebugConsole.dbgWindow.add("E: "+e.getStackTrace()+"\n");
+			        StringWriter sw = new StringWriter();
+			        e.printStackTrace(new PrintWriter(sw));
+			        String fe = sw.toString();
+			        DebugConsole.getFullStackTraceToFile("::CRITICAL\n"+fe);
+					DebugConsole.dbgWindow.add("E: "+e+"::CRITICAL\n");
 				}
 		}
 }

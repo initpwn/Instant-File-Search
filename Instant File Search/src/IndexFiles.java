@@ -1,14 +1,21 @@
 package src;
-import org.apache.commons.lang3.exception.ExceptionUtils;
+//import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.concurrent.TimeUnit;
+
 import javax.swing.filechooser.*;
 
 class Setpaths{
@@ -32,7 +39,7 @@ class Setpaths{
 									fs=(file.getFileName()).toString();	 
 									fz = ""+(attrs.size());
 									dbObj.sop("file size:"+fz);
-									dbObj.setFilesTest(fp,fs,fz);
+									dbObj.setFiles(fp,fs,fz);
 									return FileVisitResult.CONTINUE;																							
 							}
 						});
@@ -40,12 +47,26 @@ class Setpaths{
 	    	}
 	    
 	    } 
-	    catch (Exception e) {
-	    	//THIS CODE HATES ACCESS DENIED EXCEPTION.
+	    catch (AccessDeniedException e) {
+	    	//THIS CODE HATES ACCESS DENIED EXCEPTION!
 	    	//e.printStackTrace();	
 	    	//SO, PLEASE DON'T EVER EVER HANDLE IT.	    
-	   // 	DebugConsole.dbgWindow.add("E: "+e+"\n");
-	    }
+	   // 	DebugConsole.dbgWindow.add("E: "+e+"::CRITICAL\n");
+	    } catch (SQLException e) {
+	        StringWriter sw = new StringWriter();
+	        e.printStackTrace(new PrintWriter(sw));
+	        String fe = sw.toString();
+	        DebugConsole.getFullStackTraceToFile("::CRITICAL\n"+fe);
+	    	DebugConsole.dbgWindow.add("E: "+e+"::MINIMAL\n");
+	    	//e.printStackTrace();
+		} catch (IOException e) {
+			//e.printStackTrace();
+	        StringWriter sw = new StringWriter();
+	        e.printStackTrace(new PrintWriter(sw));
+	        String fe = sw.toString();
+	        DebugConsole.getFullStackTraceToFile("::CRITICAL\n"+fe);
+	    	DebugConsole.dbgWindow.add("E: "+e+"::CRITICAL\n");
+		}
 	 }
 }
 
@@ -74,7 +95,8 @@ class SetDrives{
 public class IndexFiles extends Thread {
 	static boolean chkIndex;
 	Db dbObj = new Db();
-	static int sleepMin =10000;
+	static int sleepMin =120;
+	static long sleepMilli = TimeUnit.MINUTES.toMillis(sleepMin);
 	public void indexFiles() {		
 		//Honestly, It Does Nothing.
 	}
@@ -96,11 +118,15 @@ public class IndexFiles extends Thread {
 			try {
 				Thread.currentThread().setPriority(MAX_PRIORITY);
 				chkIndex=false;
-				Thread.currentThread().sleep(sleepMin);				
+				Thread.sleep(sleepMilli);				
 			} catch (InterruptedException e) {			
 					//e.printStackTrace();
 					//Interrupts are out-of-scope exception, so ignored. ^_^
-					DebugConsole.dbgWindow.add("E: "+e+"\n");
+		        	StringWriter sw = new StringWriter();
+		        	e.printStackTrace(new PrintWriter(sw));
+		        	String fe = sw.toString();
+		        	DebugConsole.getFullStackTraceToFile("::CRITICAL\n"+fe);
+					DebugConsole.dbgWindow.add("E: "+e+"::CRITICAL\n");
 			}
 		}		
   }

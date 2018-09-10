@@ -5,6 +5,9 @@ import java.awt.Font;
 import java.awt.HeadlessException;
 import java.awt.SplashScreen;
 import java.awt.event.ActionListener;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import javax.swing.*;
 import java.awt.EventQueue;
 
@@ -18,7 +21,11 @@ public class Pmain {
 						
 				} catch (Exception e) {
 					//e.printStackTrace();
-					DebugConsole.dbgWindow.add("E: "+e+"\n");
+			        StringWriter sw = new StringWriter();
+			        e.printStackTrace(new PrintWriter(sw));
+			        String fe = sw.toString();
+			        DebugConsole.getFullStackTraceToFile("::CRITICAL\n"+fe);
+					DebugConsole.dbgWindow.add("E: "+e+"::CRITICAL\n");
 				}
 			}
 		});
@@ -45,6 +52,7 @@ class proc{
     public StartUp() {
 		IndexFiles obj = new IndexFiles();
 		obj.start();
+		obj.setName("IndexThread");
         Container container = getContentPane();
         getContentPane().setLayout(null);
         progressBar.setBackground(Color.LIGHT_GRAY);
@@ -75,7 +83,7 @@ class proc{
                 count++;
                 progressBar.setValue(count);
                 System.out.println(count);
-                if (count == 50) {
+                if (count == 525) {
                 	new proc();
                 	dispose();
                     timer1.stop();
@@ -86,7 +94,5 @@ class proc{
         timer1.start();
     }
 
-    public static void main(String[] args) {
-         new StartUp();
-    }
+
 };

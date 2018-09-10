@@ -10,6 +10,8 @@ import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import javax.swing.JOptionPane;
 
@@ -26,7 +28,8 @@ import javax.swing.JOptionPane;
    public void run() {
 	  Thread.currentThread().setPriority(MIN_PRIORITY);
 	  if (!SystemTray.isSupported()) {
-		  System.out.println("SystemTray is not supported");
+		  //System.out.println("SystemTray is not supported");		  
+		  DebugConsole.dbgWindow.add("E: SystemTray is not supported::CRITICAL\n");
 		  return;
     }
     SystemTray tray = SystemTray.getSystemTray();
@@ -55,8 +58,8 @@ import javax.swing.JOptionPane;
     dbg = new MenuItem("Debug");    
     dbg.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-    		  dbg.setEnabled(true);
-        new DebugConsole();
+    		  dbg.setEnabled(true);    		  
+    		  new DebugConsole();
       }
     });
     menu.add(dbg);
@@ -77,7 +80,11 @@ import javax.swing.JOptionPane;
 		tray.add(icon);
 	} catch (AWTException e) {
 		//e1.printStackTrace();
-		DebugConsole.dbgWindow.add("E: "+e+"\n");
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        String fe = sw.toString();
+        DebugConsole.getFullStackTraceToFile("::CRITICAL\n"+fe);
+		DebugConsole.dbgWindow.add("E: "+e+"::CRITICAL\n");
 	}
   }
 }

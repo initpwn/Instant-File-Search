@@ -1,11 +1,13 @@
 package src;
 
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.*;
 public class Db
 {
 	Connection objCon;
-	Statement objSt,smptTemp1,smptTemp2;
+	Statement objSt,smptTemp1;
 	String strError;
 	String fileName,dirPath;
 	String url;
@@ -34,14 +36,14 @@ public class Db
   				    ResultSet.TYPE_SCROLL_INSENSITIVE,
   				    ResultSet.CONCUR_READ_ONLY
   				);
-  			smptTemp2 = objCon.createStatement(
-  				    ResultSet.TYPE_SCROLL_INSENSITIVE,
-  				    ResultSet.CONCUR_READ_ONLY
-  				);
-  			  		}
+  		}
 		catch(Exception e)
 		{
-			DebugConsole.dbgWindow.add("E: "+e.getMessage()+"\n");
+	        StringWriter sw = new StringWriter();
+	        e.printStackTrace(new PrintWriter(sw));
+	        String fe = sw.toString();
+	        DebugConsole.getFullStackTraceToFile("::CRITICAL\n"+fe);
+			DebugConsole.dbgWindow.add("E: "+e+"::CRITICAL\n");
 			strError = e.toString();
 		}
 	}
@@ -62,8 +64,12 @@ public void setTabs() {
 			
 		}		
 	} catch (Exception e) {
-			//Im lazy
-		DebugConsole.dbgWindow.add("E: "+e+"\n");
+			//I'm super lazy
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        String fe = sw.toString();
+        DebugConsole.getFullStackTraceToFile("::REGULAR\n"+fe);
+		DebugConsole.dbgWindow.add("E: "+e+"::REGULAR\n");
 	}
 }
 	public void idu(String sql)
@@ -73,8 +79,12 @@ public void setTabs() {
 			objSt.executeUpdate(sql);
 		}
 		catch(Exception e)
-		{
-			DebugConsole.dbgWindow.add("E: "+e+"\n");
+		{     
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			String fe = sw.toString();
+			DebugConsole.getFullStackTraceToFile("::CRITICAL\n"+fe);
+			DebugConsole.dbgWindow.add("E: "+e+"::CRITICAL\n");
 			strError = e.toString();
 		}
 	}
@@ -88,7 +98,11 @@ public void setTabs() {
 		}
 		catch(Exception e)
 		{
-			DebugConsole.dbgWindow.add("E: "+e+"\n");
+	        StringWriter sw = new StringWriter();
+	        e.printStackTrace(new PrintWriter(sw));
+	        String fe = sw.toString();
+	        DebugConsole.getFullStackTraceToFile("::MINIMAL\n"+fe);
+			DebugConsole.dbgWindow.add("E: "+e+"::MINIMAL\n");
 			strError = e.toString();
 		}
 		return objRs;
@@ -103,7 +117,11 @@ public void setTabs() {
 		}
 		catch(Exception e)
 		{
-			DebugConsole.dbgWindow.add("E: "+e+"\n");
+	        StringWriter sw = new StringWriter();
+	        e.printStackTrace(new PrintWriter(sw));
+	        String fe = sw.toString();
+	        DebugConsole.getFullStackTraceToFile("::MINIMAL\n"+fe);
+			DebugConsole.dbgWindow.add("E: "+e+"::MINIMAL\n");
 			strError = e.toString();
 		}
 		return objRs;
@@ -115,7 +133,7 @@ public void setTabs() {
 		return strError;
 	}
 
-	public void setFilesTest(String path,String fileP,String fSize) {
+	public void setFiles(String path,String fileP,String fSize) {
 		int strLen = fileP.length();
 		int p=-1;
 		String ext;

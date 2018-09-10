@@ -10,13 +10,15 @@ import java.awt.EventQueue;
 
 public class Pmain {
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				try {	new startUp();
+				try {	
+					new StartUp();
 						
 				} catch (Exception e) {
-					e.printStackTrace();
+					//e.printStackTrace();
+					DebugConsole.dbgWindow.add("E: "+e+"\n");
 				}
 			}
 		});
@@ -26,9 +28,6 @@ public class Pmain {
 class proc{
 	public proc() {
 		Core window = new Core();
-		//window.start();
-	//	IndexFiles obj = new IndexFiles();
-	//	obj.start();
 		window.start();
 		Tray tobj = new Tray();
 		tobj.start();
@@ -36,17 +35,14 @@ class proc{
 	}
 }
 
-
-
- class startUp extends JWindow {
-
+ class StartUp extends JWindow {
     static boolean isRegistered;
     private static JProgressBar progressBar = new JProgressBar();
     private static SplashScreen execute;
     private static int count;
     private static Timer timer1;
 
-    public startUp() {
+    public StartUp() {
 		IndexFiles obj = new IndexFiles();
 		obj.start();
         Container container = getContentPane();
@@ -79,17 +75,11 @@ class proc{
                 count++;
                 progressBar.setValue(count);
                 System.out.println(count);
-                if (count == 550) {
+                if (count == 50) {
                 	new proc();
                 	dispose();
                     timer1.stop();
                 }
-            }
-            private void createFrame() throws HeadlessException {
-                JFrame frame = new JFrame();
-                frame.setSize(500, 500);
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.setVisible(true);
             }
         };
         timer1 = new Timer(50, al);
@@ -97,6 +87,6 @@ class proc{
     }
 
     public static void main(String[] args) {
-         new startUp();
+         new StartUp();
     }
 };

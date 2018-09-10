@@ -1,7 +1,6 @@
 package src;
 
 import javax.swing.JFrame;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -18,26 +17,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import net.proteanit.sql.DbUtils;
-
 import javax.swing.JLabel;
 import javax.swing.JCheckBox;
 import javax.swing.SwingConstants;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Point;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-
 import javax.swing.JList;
-import javax.swing.JComboBox;
-import javax.swing.JSeparator;
 
 public class Core extends Thread {	
 	public JFrame frame;
@@ -46,7 +34,6 @@ public class Core extends Thread {
 	public static JLabel lblNewLabel;
 	int columnCount,colCount,c=0;
 	JButton btnSrch;
-	// scrollPane;
 	JCheckBox chckbxByExtension ;
 	ResultSet rs ;
 	String usrser;
@@ -90,9 +77,10 @@ public class Core extends Thread {
 					lblNewLabel_1.setText("Next indexing in "+indObj.sleepMin/10000+" minutes.");
 				}
 				Thread.currentThread().sleep(2000);
-				} catch (InterruptedException e) {
-				
-					e.printStackTrace();
+				} 
+				catch (InterruptedException e) {										
+					DebugConsole.dbgWindow.add("E: "+e+"\n");
+					//e.printStackTrace();
 			}					
 		}
 	}
@@ -112,13 +100,18 @@ public class Core extends Thread {
 		});
 		table.addMouseListener(new MouseAdapter() {
 		    public void mousePressed(MouseEvent mouseEvent) {
+		    	String sep="";
 		        JTable table1 =(JTable) mouseEvent.getSource();
 		        Point point = mouseEvent.getPoint();
 		        int row = table1.rowAtPoint(point);
 		        if (mouseEvent.getClickCount() == 2 && table1.getSelectedRow() != -1) {
 		        	System.out.println("Row: "+table1.getSelectedRow()+"Col:"+ table1.getSelectedColumn());
+		        	if(table1.getValueAt(table1.getSelectedRow(),table1.getSelectedColumn()+1).toString().charAt((table1.getValueAt(table1.getSelectedRow(),table1.getSelectedColumn()+1).toString()).length()-1)=='\\') {
+	        			sep="";
+	        	}else
+	        		sep="\\";
 		        	if(table1.getSelectedColumn()==0) {
-		        		FPath = table1.getValueAt(table1.getSelectedRow(),table1.getSelectedColumn()+1)+"\\"+table1.getValueAt(table1.getSelectedRow(),table1.getSelectedColumn());
+		        		FPath = table1.getValueAt(table1.getSelectedRow(),table1.getSelectedColumn()+1)+sep+table1.getValueAt(table1.getSelectedRow(),table1.getSelectedColumn());
 		        		System.out.println("path:"+FPath);
 		        	}
 		        	else
@@ -129,9 +122,14 @@ public class Core extends Thread {
 		        	else
 		        	if(table1.getSelectedColumn()==2) {}
 		        	try {
-						Runtime.getRuntime().exec("explorer.exe " + FPath);
-					} catch (IOException e) {						
-						e.printStackTrace();
+		        	//	FPath=FPath.replaceAll("\\\\", "\\");
+		        		String run = "explorer.exe "+"\""+FPath+"\"";
+		        		System.out.println(run);
+						Runtime.getRuntime().exec(run);
+					} 
+		        	catch (IOException e) {						
+						//e.printStackTrace();
+		        		DebugConsole.dbgWindow.add("E: "+e+"\n");
 					}
 		        	
 		        }
@@ -166,7 +164,8 @@ public class Core extends Thread {
 					}
 				}
 				catch (Exception e1) {
-					e1.printStackTrace();					
+					//e1.printStackTrace();		
+					DebugConsole.dbgWindow.add("E: "+e+"\n");
 				}				
 			}
 		});							
@@ -238,8 +237,7 @@ public class Core extends Thread {
 				if(btnIndexEvery.getText().equals(""))
 						btnIndexEvery.setText(""+0);
 				sleepMin=(Integer.parseInt(textField_1.getText())*10000);
-				indObj.sleepMinSetter((int)sleepMin);
-				//Thread.currentThread().;				
+				indObj.sleepMinSetter((int)sleepMin);				
 				lblNewLabel_1.setText("Next indexing in "+sleepMin/10000+" minutes.");
 			}
 		});
@@ -253,8 +251,7 @@ public class Core extends Thread {
 		lblNewLabel_1 = new JLabel("");
 		lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblNewLabel_1.setBounds(249, 2, 361, 16);
-		frame.getContentPane().add(lblNewLabel_1);
-		
+		frame.getContentPane().add(lblNewLabel_1);		
 		chckbxGetDuplicates = new JCheckBox("Get Duplicates");		
 		chckbxGetDuplicates.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -273,11 +270,11 @@ public class Core extends Thread {
 	public String chkUsrOpt(){
 		String usrser1 = textField.getText();
 		usrser1=usrser1.replaceAll("[*]", "");
-		 sql_whole = "select \"File Name\",\"File Location\",\"File Type\" from "+dbObj.DBTab2+" where \"File Name\" = '"+usrser1.toLowerCase()+"'";
-		 sql_any = "select \"File Name\",\"File Location\",\"File Type\"  from "+dbObj.DBTab2+" where  \"File Name\" like'"+usrser1.toLowerCase()+"%'";
-		 sql_contains = "select \"File Name\",\"File Location\",\"File Type\" from "+dbObj.DBTab2+" where \"File Name\" like '%"+usrser1.toLowerCase()+"%'";	
-		 sql_byExt= "select \"File Name\",\"File Location\",\"File Type\" from "+dbObj.DBTab2+" where \"File Type\" ='"+usrser1.toUpperCase()+"'";
-		 sql_GetDup="select distinct \"File Name\",\"File Location\",\"File Type\" from "+dbObj.DBTab2+" where \"File Name\" in (select \"File Name\" from "+dbObj.DBTab2+" group by \"File Name\" having count(*)>1) order by 1";
+		 sql_whole = "select \"File Name\",\"File Location\",\"File Type\", \"File Size\" from "+dbObj.DBTab2+" where \"File Name\" = '"+usrser1.toLowerCase()+"'";
+		 sql_any = "select \"File Name\",\"File Location\",\"File Type\", \"File Size\"  from "+dbObj.DBTab2+" where  \"File Name\" like'"+usrser1.toLowerCase()+"%'";
+		 sql_contains = "select \"File Name\",\"File Location\",\"File Type\", \"File Size\" from "+dbObj.DBTab2+" where \"File Name\" like '%"+usrser1.toLowerCase()+"%'";	
+		 sql_byExt= "select \"File Name\",\"File Location\",\"File Type\", \"File Size\" from "+dbObj.DBTab2+" where \"File Type\" ='"+usrser1.toUpperCase()+"'";
+		 sql_GetDup="select distinct \"File Name\",\"File Location\",\"File Type\", \"File Size\" from "+dbObj.DBTab2+" where \"File Name\" in (select \"File Name\" from "+dbObj.DBTab2+" group by \"File Name\" having count(*)>1) order by 1";
 		if(chkBxNo==1) 
 			return(sql_contains);		
 		if(chkBxNo==2) 
@@ -313,6 +310,7 @@ public class Core extends Thread {
 	    columnNames.add("File Name");
 	    columnNames.add("File Location");
 	    columnNames.add("File Type");
+	    columnNames.add("File Size (Bytes)");
 	    Vector<Vector<Object>> data = new Vector<Vector<Object>>();
 	    while (rs.next()) {
 	        Vector<Object> vector = new Vector<Object>();

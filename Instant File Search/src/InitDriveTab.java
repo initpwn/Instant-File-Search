@@ -18,7 +18,7 @@ public class InitDriveTab {
 						}
 					}
 				} catch (Exception e) {
-						dbObj.sop(""+e);
+					DebugConsole.dbgWindow.add("E: "+e.getStackTrace()+"\n");
 				}
 		}
 }

@@ -5,6 +5,7 @@ Another simple file search utility based of indexing, build on Java.
 # THIS PROJECT IS NO LONGER ACTIVELY MAINTAINED.
 
 This software is released under the MIT license.
+
 Copyright (c) 2018, Joseph Philip
 
 * Make sure that you're using a Windows NT machine.
